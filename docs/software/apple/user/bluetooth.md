@@ -21,9 +21,26 @@ The app remembers your preferred device and reconnects automatically when the ra
 
 Swipe left on a connected radio in the Connect view and tap **Disconnect**. The radio continues operating on the mesh — it just stops syncing with the app.
 
+## Powering Off a Radio
+
+Long press a connected radio row and choose **Power Off** to shut the radio down completely. Unlike **Disconnect** — which only stops the app from syncing — Power Off turns the radio off entirely, and you must physically power it back on to use it again.
+
+Because that is hard to undo on a roof, tower, or other remote node, the app asks you to confirm before sending the shutdown, so an accidental tap (or a misplaced finger) won't power the device off.
+
 ## Live Activity
 
-Long press a connected radio row to start a Live Activity (iOS 16.2+). The Live Activity shows mesh status on your Lock Screen and in Dynamic Island.
+A Live Activity keeps the mesh on your Lock Screen and in the Dynamic Island. It shows one of two things, chosen when you start it:
+
+- **Mesh status** — the connection, nodes online, unread messages and the radio's battery.
+- **One node** — its battery, signal, when it was last heard and how far away it is.
+
+Tap **Live Activity** on the Connect screen while a radio is connected, choose what to show (for a node, pick it from the list; favorites come first), and tap **Start Live Activity**. You can also open a node and choose **Track in Live Activity**.
+
+Only one runs at a time; starting the other kind switches it. Stop it from the same **Live Activity** row, or from the node's detail screen.
+
+If the radio's link drops, the Live Activity shows **Disconnected** and picks up again when the app reconnects. Disconnecting the radio yourself, or switching to a different radio, ends it. iOS stops updating a Live Activity after 8 hours, and the Connect screen shows when that will be.
+
+On iOS 18 and later, a running Live Activity also appears in the Smart Stack on a paired Apple Watch, and on iOS 26 on the CarPlay Dashboard.
 
 ## Managing Multiple Radios
 
@@ -49,8 +66,10 @@ The app displays the Bluetooth signal strength of nearby devices during scanning
 ## Troubleshooting
 
 **Radio not appearing in the list**
-- Ensure Bluetooth is enabled in iOS Settings → Bluetooth.
-- Move within 10 metres of the radio.
+- Ensure Bluetooth is enabled in iOS Settings → Bluetooth. If Bluetooth is off, the Connect tab's Available Radios section shows a "Bluetooth is off" row — tap it to jump straight to Settings.
+
+  ![Bluetooth is off row](/img/apple/bluetoothOff.webp)
+- Move within 10 meters of the radio.
 - Restart the radio.
 - The app continuously listens for BLE advertisements — nearby radios should appear within a few seconds. If a device disappears from the list, it will reappear automatically when next heard.
 
@@ -64,5 +83,5 @@ The app displays the Bluetooth signal strength of nearby devices during scanning
 ---
 
 :::tip Connected Radio
-Swipe left to disconnect. Long press to start the Live Activity.
+Swipe left to disconnect. Long press for more options, such as powering off the radio (you'll be asked to confirm).
 :::
