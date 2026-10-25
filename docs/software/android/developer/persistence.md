@@ -1,13 +1,14 @@
 ---
 title: Persistence
 sidebar_position: 6
-last_updated: 2026-06-11
+last_updated: 2026-09-28
+description: The app's three persistence layers — Room, DataStore, and core:prefs — and when a contributor should use each.
 parent: Developer Guide
 ---
 
 # Persistence
 
-How the Meshtastic app stores data across different mechanisms.
+The app's three persistence layers — Room, DataStore, and `core:prefs` — and when a contributor should use each.
 
 ## Room KMP Database
 
@@ -18,7 +19,7 @@ The primary structured data store:
 - Message history
 - Waypoints
 - Telemetry data
-- Channel configurations
+- Channel set configuration (channel names and LoRa config)
 
 ### Key Points
 
@@ -40,23 +41,31 @@ The primary structured data store:
 | `ReactionEntity` | Emoji reactions on messages |
 | `MeshLog` | Raw mesh protocol logs |
 | `MetadataEntity` | Device metadata (firmware version, hardware model) |
+| `ChannelSetEntity` | The connected radio's channel set — channel names and LoRa config — one row per device |
 | `QuickChatAction` | User-configured quick-chat messages |
 | `DeviceHardwareEntity` | Cached device hardware catalog |
 | `FirmwareReleaseEntity` | Cached firmware release info |
 | `TracerouteNodePositionEntity` | Traceroute hop position data |
+| `DiscoverySessionEntity` | A Local Mesh Discovery scan session (timestamp, presets scanned, home preset) |
+| `DiscoveryPresetResultEntity` | Per-preset result within a discovery session |
+| `DiscoveredNodeEntity` | Nodes found during a discovery preset scan |
+| `DeviceLinkEntity` | Cached `msh.to` device links from the Meshtastic API |
+| `EventFirmwareEditionEntity` | Event-firmware display records cached from the Meshtastic API (`/resource/eventFirmware`) |
+| `BootloaderOtaQuirksCacheEntity` | Single-row cache of the nRF52 bootloader/OTA quirk catalog (`/resource/bootloaderOtaQuirks`), stored as one serialized envelope |
+| `MaintenanceUf2CacheEntity` | Single-row cache of the maintenance-UF2 manifest (`/resource/maintenanceUf2`), stored as one serialized envelope |
+| `MergeMarkerEntity` | Marks a completed `DatabaseMerger` merge so a re-run on the next connection skips it instead of duplicating rows |
 
-> 💡 **Note:** Waypoints, telemetry, and channel data are stored within the `Packet` entity (using the `port_num` field to distinguish packet types) rather than in separate tables.
+> ℹ️ **Note:** Waypoints and telemetry are stored within the `Packet` entity (the `port_num` field distinguishes packet types), alongside a `channel` index recording which channel each packet used. Channel *configuration* — names and LoRa settings — lives separately, in `ChannelSetEntity`.
 
 ## DataStore Preferences
 
 **Module:** `core:datastore`
 
 For lightweight key-value preferences:
-- Local radio configuration (LocalConfig proto)
-- Module configuration (ModuleConfig proto)
-- Channel set data
+- Local radio configuration (`LocalConfig`)
+- Module configuration (`ModuleConfig`)
 - Local statistics
-- Recently connected device addresses
+- Recently connected radio addresses
 
 ## Core Prefs
 
@@ -69,16 +78,7 @@ Higher-level preferences abstraction:
 
 ## What Docs Intentionally Skip
 
-The `feature:docs` module does **not** use Room or any persistent database:
-- Documentation content is packaged as build-time assets
-- The docs corpus is versioned with the app binary
-- No migration story is needed for docs content
-- Optional UX state (last viewed page) could use `core:prefs` but is not part of the docs data model
-
-This is an intentional design decision to keep documentation:
-- Fully offline without database overhead
-- Replaceable with each app update
-- Simple to validate and test
+The `feature:docs` module uses **no** Room or persistent database. Documentation ships as build-time assets versioned with the app binary, so it stays fully offline, is replaced on each update, and needs no migration story. Optional UX state (e.g. last viewed page) could live in `core:prefs` but isn't part of the docs data model.
 
 ## Best Practices
 
@@ -87,6 +87,3 @@ This is an intentional design decision to keep documentation:
 - Use bundled resources/assets for static content
 - Never store sensitive data (keys, passwords) in plain Room tables
 - Always provide migrations for schema changes
-
----
-

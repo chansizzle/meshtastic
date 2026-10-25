@@ -1,7 +1,8 @@
 ---
 title: Navigation & Deep Links
 sidebar_position: 4
-last_updated: 2026-05-13
+last_updated: 2026-09-19
+description: How typed Navigation 3 routes and DeepLinkRouter work together, the supported deep link URIs, and how to add a new one.
 parent: Developer Guide
 ---
 
@@ -9,11 +10,11 @@ parent: Developer Guide
 
 The app uses **Navigation 3** with typed, serializable routes and centralized deep link resolution.
 
-## Route Architecture
+## Route architecture
 
 All routes are defined in `core/navigation/src/commonMain/kotlin/org/meshtastic/core/navigation/Routes.kt`.
 
-### Route Hierarchy
+### Route hierarchy
 
 ```kotlin
 interface Route : NavKey           // All routes implement NavKey
@@ -37,30 +38,77 @@ sealed interface SettingsRoute : Route {
 - Group related routes under a `sealed interface`
 - Graph entry points implement both the route interface and `Graph`
 
-## Deep Link Router
+## Deep link router
 
-`DeepLinkRouter` in `core/navigation` maps URI deep links to typed backstack lists.
+`DeepLinkRouter` in `core/navigation` maps URI deep links to typed backstack lists. Each supported link is a
+Navigation 3 `UriDeepLinkMatcher` pattern whose placeholders decode into the target route's fields, wrapped in
+`withBackStack` to synthesize the parents.
 
-### URI Format
+Patterns are anchored, so a path the patterns don't model returns null rather than falling back to the family
+root: `/firmware/anything-else` no longer opens the firmware screen.
 
-```
+### URI format
+
+Both forms resolve through the same `DeepLinkRouter`, so any deep link path works with either scheme:
+
+```text
 meshtastic://meshtastic/{path}
+https://meshtastic.org/{path}       # App Link, android:autoVerify — also opens in-app on a real device/adb
 ```
 
-### Supported Deep Links
+`adb shell am start -a android.intent.action.VIEW -d "meshtastic://meshtastic/{path}"` is the fastest way to
+trigger any route in the Supported Deep Links table from a shell or automation script without touching the UI.
+
+For the `https` form to open in-app, each top-level path segment must also be declared as an
+`android:pathPrefix` in the `android:autoVerify` intent-filter in `androidApp/src/main/AndroidManifest.xml` —
+otherwise the link opens in the browser. Adding a new top-level route therefore takes three steps: add the
+segment to `DeepLinkRouter.topLevelPathSegments` (the router refuses to dispatch segments outside that set),
+add its matcher to `DeepLinkRouter.matchers`, and add the matching `pathPrefix` to the manifest.
+`DeepLinkManifestConsistencyTest` (androidApp unit tests) checks the manifest against the set, so a missing
+manifest entry fails CI.
+
+**Source of truth:**
+
+- The always-current list of top-level segments is `topLevelPathSegments` in
+  [`DeepLinkRouter`](https://github.com/meshtastic/Meshtastic-Android/blob/main/core/navigation/src/commonMain/kotlin/org/meshtastic/core/navigation/DeepLinkRouter.kt).
+- Sub-paths live in the `matchers` list plus its helper maps (`settingsSubRoutes`, `nodeDetailSubRoutes`).
+- The class-level KDoc on the `DeepLinkRouter` object lists example mappings, but it's illustrative, not
+  exhaustive.
+- The executable spec is
+  [`DeepLinkRouterTest.kt`](https://github.com/meshtastic/Meshtastic-Android/blob/main/core/navigation/src/commonTest/kotlin/org/meshtastic/core/navigation/DeepLinkRouterTest.kt).
+- The following table is a snapshot for quick reference — check those two files if it looks out of date.
+
+### Supported deep links
 
 | URI Path | Route | Notes |
 |----------|-------|-------|
+| `/connections` | `ConnectionsRoute.Connections(null)` | Connections screen |
+| `/connections?address={prefixedAddress}` | `ConnectionsRoute.Connections(address)` | Connects to a node once the user confirms the "Connect to this device?" dialog — the address uses the app's internal transport-prefixed format: `t192.168.1.1:4403` (TCP), `xAA:BB:CC:DD:EE:FF` (BLE), `s/dev/ttyUSB0` (serial). Intended for scripts/AI tooling driving the app; a debug build started through its shell-only `org.meshtastic.app.AutomationLauncher` alias with the `skip_connect_confirm` intent extra, or with the `--skip-connect-confirm` argument on desktop, applies the address it was launched with without the dialog; links that arrive later still ask. |
+| `/connections?address=n` | `ConnectionsRoute.Connections("n")` | Disconnects the current node instead of connecting (`n` = the internal "no device selected" sentinel), after the same confirmation. |
+| `/wifi-provision` | `WifiProvisionRoute.WifiProvision(null)` | Wi-Fi provisioning screen |
+| `/wifi-provision?address={mac}` | `WifiProvisionRoute.WifiProvision(mac)` | Provisioning targeting a specific node MAC |
 | `/settings` | `SettingsRoute.Settings(null)` | Settings root |
 | `/settings/helpDocs` | `SettingsRoute.HelpDocs` | Docs browser |
 | `/settings/helpDocs/{pageId}` | `SettingsRoute.HelpDocPage(pageId)` | Specific doc page |
 | `/settings/help-docs` | `SettingsRoute.HelpDocs` | Compatibility alias |
+| `/discovery` | `DiscoveryRoute.DiscoveryGraph` | Local Mesh Discovery entry point |
+| `/settings/local-mesh-discovery/session/{sessionId}` | `DiscoveryRoute.DiscoverySummary(sessionId)` | Discovery session result |
 | `/nodes` | `NodesRoute.Nodes` | Node list |
 | `/nodes/{destNum}` | `NodesRoute.NodeDetail(destNum)` | Node detail |
-| `/messages/{contactKey}` | `ContactsRoute.Messages(contactKey)` | Conversation |
+| `/nodes/{destNum}/{metric}` | e.g. `NodeDetailRoute.DeviceMetrics(destNum)` | Specific node metric tab (`device-metrics`, `signal`, `power`, `traceroute`, `pax`, `neighbors`, ...) |
+| `/messages` | `ContactsRoute.Contacts` | Conversation list |
+| `/messages/{contactKey}` | `ContactsRoute.Messages(contactKey)` | Specific conversation |
+| `/share?message={text}` | `ContactsRoute.Share(message)` | Share-to-contact composer |
+| `/quickchat` | `ContactsRoute.QuickChat` | Quick chat picker |
 | `/map` | `MapRoute.Map(null)` | Map view |
+| `/map/{waypointId}` | `MapRoute.Map(waypointId)` | Map centered on a waypoint |
+| `/channels` | `ChannelsRoute.Channels` | Channel list |
+| `/firmware` | `FirmwareRoute.FirmwareGraph` | Firmware screen |
+| `/firmware/update` | `FirmwareRoute.FirmwareUpdate` | Firmware update flow |
 
-### Backstack Synthesis
+Demo Mode's addresses start with `m`. In a debug build, or once hidden features are unlocked, `/connections?address=m` connects to the demo mesh and `/connections?address=mshowcase` to the store-screenshot mesh, which the device picker never lists. `MockScenario` in `:core:network` holds both.
+
+### Backstack synthesis
 
 Deep links synthesize a full backstack, not just the target screen:
 
@@ -75,14 +123,16 @@ listOf(
 
 This ensures the user can navigate "up" correctly.
 
-## Adding a Deep Link
+## Adding a deep link
 
 1. Define the typed route in `Routes.kt`.
-2. Add the mapping in `DeepLinkRouter.settingsSubRoutes` (or equivalent for other graphs).
+2. Add the mapping in `DeepLinkRouter.settingsSubRoutes` (or equivalent for other graphs), and a matcher in
+   `DeepLinkRouter.matchers` if the path shape is new.
 3. Add a test in `DeepLinkRouterTest.kt`.
 4. Register the navigation entry in the appropriate feature module.
+5. Update the illustrative KDoc list on the `DeepLinkRouter` object (the class-level doc comment, not `route()`'s own KDoc) and the preceding table — both are quick-reference snapshots, not the source of truth. See the Source of Truth list earlier in this page for the authoritative places.
 
-## Navigation Entry Registration
+## Navigation entry registration
 
 Each feature module provides entries via an extension function:
 
@@ -98,9 +148,6 @@ These are called from the settings navigation composition.
 ## Testing
 
 Deep link routing is tested in:
-```
+```text
 core/navigation/src/commonTest/kotlin/org/meshtastic/core/navigation/DeepLinkRouterTest.kt
 ```
-
----
-
