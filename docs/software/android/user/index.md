@@ -10,8 +10,6 @@ parent: User Guide
 
 Documentation for using the Meshtastic Android and Desktop app.
 
----
-
 ## What's New in the Docs
 
 <!-- WHATS_NEW_START -->
@@ -20,25 +18,23 @@ Documentation for using the Meshtastic Android and Desktop app.
 Keep the last 5–8 entries and archive older ones by removing them.
 -->
 
-**June 2026** — [Help & In-App Docs](help-and-docs.md) — New page covering the in-app documentation browser, search, and the on-device Chirpy AI assistant.
+**September 2026** — [Notifications](notifications.md) — A new page lists every notification category, what each opens when tapped, when a message stays quiet, and what a message notification lets you do from the shade or a watch.
 
-**June 2026** — [Home Screen Widget](widget.md) — New page covering the Android home screen widget that shows your connected radio's local stats at a glance.
+**September 2026** — [Nodes](nodes.md) — Nodes your node has not heard since its LoRa settings changed now carry an orange marker, a **Hide unheard nodes** filter, and a banner whose **Remove** action deletes them in bulk.
 
-**June 2026** — [Discovery](discovery.md) — Added the Local Mesh Discovery scanner: a dedicated mode that cycles your radio through LoRa presets, dwells on each to collect packets, and ranks which preset works best at your location.
+**September 2026** — [Settings — Radio & User](settings-radio-user.md) — Lockdown's debug-port lock is not reversible from the app, Managed Mode locks the whole configuration list, and the preset list is filtered to what your region permits.
 
-**June 2026** — [Node Metrics](node-metrics.md) — Added Air Quality metrics (PM1.0, PM2.5, PM10, and CO₂ with severity color bands), a separate view from the BME680 IAQ reading.
+**September 2026** — [Local Mesh Discovery](discovery.md) — Signal colours are relative to the preset's demodulation floor rather than fixed thresholds, and a beacon's broadcast targets always hold at least one row.
 
-**June 2026** — [Messages & Channels](messages-and-channels.md) — Added full-text message search within a conversation, with a result counter and previous/next navigation.
+**September 2026** — [Nodes](nodes.md) — Nodes on firmware 2.8 show signed and verified identity icons in place of the PKI lock, and **Signed only** and **Encrypted only** filters join the node list and the map.
 
-**June 2026** — [Android Auto](android-auto.md) — New page covering Meshtastic in Android Auto.
+**September 2026** — [Map & Waypoints](map-and-waypoints.md) — Offline terrain (hillshade and contours) can be downloaded on Google Play, F-Droid, and Desktop.
 
-**June 2026** — [App Functions](app-functions.md) — New page covering App Functions, which exposes app actions to the Android system AI on Google flavor builds.
+**August 2026** — [Local Mesh Discovery](discovery.md) — Mesh Beacon advertises the region and preset your radio actually uses, requires a region and a standard modem preset before it will broadcast, and hides invitations to channels your radio already has.
 
-**May 2026** — [Translate the App](translate.md) — New page explaining how to contribute translations to the Meshtastic app via Crowdin.
+**August 2026** — [Map & Waypoints](map-and-waypoints.md) — Filter the map by node role and by how a node was heard, from a new filter sheet.
 
-**May 2026** — [Units & Locale](units-and-locale.md) — New page explaining how the app automatically adapts temperatures, distances, speeds, and times to your device's regional settings.
-
-**May 2026** — [Signal Meter](signal-meter.md) — New page explaining how the LoRa signal quality meter works, why negative SNR values are normal, and how to interpret RSSI vs. SNR.
+**August 2026** — [Map & Waypoints](map-and-waypoints.md) — Every map layer and overlay now has its own opacity slider.
 
 <!-- WHATS_NEW_END -->
 
