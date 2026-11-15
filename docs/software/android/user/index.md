@@ -10,8 +10,6 @@ parent: User Guide
 
 Documentation for using the Meshtastic Android and Desktop app.
 
----
-
 ## What's New in the Docs
 
 <!-- WHATS_NEW_START -->
@@ -20,25 +18,21 @@ Documentation for using the Meshtastic Android and Desktop app.
 Keep the last 5–8 entries and archive older ones by removing them.
 -->
 
-**June 2026** — [Help & In-App Docs](help-and-docs.md) — New page covering the in-app documentation browser, search, and the on-device Chirpy AI assistant.
+**October 2026** — [Firmware Updates](firmware.md) — What the Meshtastic nRF52 Bootloader does while the update drive is up, and where a node waits after a dropped Bluetooth update.
 
-**June 2026** — [Home Screen Widget](widget.md) — New page covering the Android home screen widget that shows your connected radio's local stats at a glance.
+**October 2026** — [Settings — Radio & User](settings-radio-user.md) — Each configuration screen has its own section, settings use the app's exact labels, and every table lists the default value.
 
-**June 2026** — [Discovery](discovery.md) — Added the Local Mesh Discovery scanner: a dedicated mode that cycles your radio through LoRa presets, dwells on each to collect packets, and ranks which preset works best at your location.
+**October 2026** — [Firmware Updates](firmware.md) — A node on firmware from 2.3.15 up to 2.5.14 stays connected behind a required-update screen, and the Connect tab flags a newer stable release.
 
-**June 2026** — [Node Metrics](node-metrics.md) — Added Air Quality metrics (PM1.0, PM2.5, PM10, and CO₂ with severity color bands), a separate view from the BME680 IAQ reading.
+**October 2026** — [Messages & Channels](messages-and-channels.md) — A failed message can be resent in place, and on firmware 2.8.1 or newer a direct message can show **Delivered to recipient · proven**.
 
-**June 2026** — [Messages & Channels](messages-and-channels.md) — Added full-text message search within a conversation, with a result counter and previous/next navigation.
+**October 2026** — [Desktop App](desktop.md) — Site Planner computes coverage inside the app and adds it to the map as a layer.
 
-**June 2026** — [Android Auto](android-auto.md) — New page covering Meshtastic in Android Auto.
+**October 2026** — [Map & Waypoints](map-and-waypoints.md) — The AR mesh view draws nodes and waypoints over the phone's camera and turns you toward the one you are finding.
 
-**June 2026** — [App Functions](app-functions.md) — New page covering App Functions, which exposes app actions to the Android system AI on Google flavor builds.
+**September 2026** — [Notifications](notifications.md) — A page that lists every notification category, what each opens when tapped, when a message stays quiet, and what a message notification lets you do from the shade or a watch.
 
-**May 2026** — [Translate the App](translate.md) — New page explaining how to contribute translations to the Meshtastic app via Crowdin.
-
-**May 2026** — [Units & Locale](units-and-locale.md) — New page explaining how the app automatically adapts temperatures, distances, speeds, and times to your device's regional settings.
-
-**May 2026** — [Signal Meter](signal-meter.md) — New page explaining how the LoRa signal quality meter works, why negative SNR values are normal, and how to interpret RSSI vs. SNR.
+**September 2026** — [Nodes](nodes.md) — On firmware 2.8.1 or newer, nodes your node has not heard since its LoRa settings changed carry an orange marker, a **Hide unheard nodes** filter, and a banner whose **Remove** action deletes them after you confirm.
 
 <!-- WHATS_NEW_END -->
 
